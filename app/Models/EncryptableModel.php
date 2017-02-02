@@ -3,13 +3,14 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Crypt;
 
 class EncryptableModel extends Model
 {
     public function setAttribute($key, $value)
     {
         if (in_array($key, $this->protectedColumns)) {
-            $value = '__' . $value;
+            $value = Crypt::encrypt($value);
         }
 
         parent::setAttribute($key, $value);
@@ -20,7 +21,7 @@ class EncryptableModel extends Model
         $value = parent::getAttribute($key);
 
         if (in_array($key, $this->protectedColumns)) {
-            $value = substr($value, 2);
+            $value = Crypt::decrypt($value);
         }
 
         return $value;
