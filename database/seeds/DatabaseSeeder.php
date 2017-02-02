@@ -15,12 +15,17 @@ class DatabaseSeeder extends Seeder
     {
         DB::table('messages')->truncate();
 
-        $message = new Message();
+        $persons = ['John', 'Jane', 'Alice', 'Bob', 'Eve'];
+        $examples = ['Hi', 'Bye', 'This is a secrect', 'X', 'Cool!'];
 
-        $message->from = str_random(10);
-        $message->to = str_random(10);
-        $message->content = str_random(100);
+        for ($i = 0; $i < 5; $i++) {
+            $message = new Message();
 
-        $message->save();
+            $message->from = $persons[array_rand($persons)];
+            $message->to = $persons[array_rand($persons)];
+            $message->content = $examples[array_rand($examples)];
+
+            $message->save();
+        }
     }
 }
