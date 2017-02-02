@@ -9,10 +9,21 @@ class Controller extends BaseController
 {
     public function index()
     {
-        $data = Message::query()
-            ->orderBy('id', 'desc')
-            ->limit(5)
-            ->get();
+        $data = Message::all()
+            ->map(function (Message $row) {
+                return [
+                    'from'    => $row->from,
+                    'to'      => $row->to,
+                    'content' => $row->content,
+                ];
+            });
+
+        return response()->json($data);
+    }
+
+    public function raw()
+    {
+        $data = app('db')->select("SELECT `from`, `to`, `content` FROM messages");
 
         return response()->json($data);
     }
