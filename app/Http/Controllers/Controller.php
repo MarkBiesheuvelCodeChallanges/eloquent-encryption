@@ -8,9 +8,7 @@ class Controller extends BaseController
 {
     public function index()
     {
-        $data = [
-            'foo' => 'bar',
-        ];
+        $data = app('db')->select("SELECT 'bar' AS foo");
 
         return response()->json($data);
     }
