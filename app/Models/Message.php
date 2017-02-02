@@ -2,14 +2,18 @@
 
 namespace App\Models;
 
-class Message extends EncryptableModel
+use Illuminate\Database\Eloquent\Model;
+
+class Message extends Model
 {
+    use Concerns\ProtectedAttributes;
+
     /**
-     * Encrypt the to and content field but not the from field
+     * The attributes that are protected
      *
      * @var array
      */
-    protected $protectedColumns = [
+    protected $protected = [
         'to',
         'content',
     ];

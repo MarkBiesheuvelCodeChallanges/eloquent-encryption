@@ -1,11 +1,17 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Concerns;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Crypt;
 
-class EncryptableModel extends Model
+/**
+ * Class ProtectedAttributes
+ *
+ * Overrides functions from Illuminate\Database\Eloquent\Concerns\HasAttributes
+ *
+ * @package App\Models\Concerns
+ */
+trait ProtectedAttributes
 {
     /**
      * Encrypt a value
@@ -37,7 +43,7 @@ class EncryptableModel extends Model
      */
     protected function isProtected($key)
     {
-        return in_array($key, $this->protectedColumns);
+        return is_array($this->protected) && in_array($key, $this->protected);
     }
 
     /**
