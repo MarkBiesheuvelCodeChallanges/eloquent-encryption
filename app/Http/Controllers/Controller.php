@@ -9,14 +9,7 @@ class Controller extends BaseController
 {
     public function index()
     {
-        $data = Message::all()
-            ->map(function (Message $row) {
-                return [
-                    'from'    => $row->from,
-                    'to'      => $row->to,
-                    'content' => $row->content,
-                ];
-            });
+        $data = Message::all(['from', 'to', 'content']);
 
         return response()->json($data);
     }
