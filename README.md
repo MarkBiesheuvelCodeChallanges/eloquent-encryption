@@ -17,9 +17,13 @@ way "normal" attributes are.
 - You are not allowed to use third party packages that add this
 functionality to Eloquent
 
+---
+
 # Solution
 
 For these examples I'm using httpie, but curl or wget can be used as well.
+
+I have left out validation and error handling.
 
 ## Start server
 
