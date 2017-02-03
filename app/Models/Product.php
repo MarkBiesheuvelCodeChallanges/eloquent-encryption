@@ -9,6 +9,13 @@ class Product extends Model
     use Concerns\ProtectedAttributes;
 
     /**
+     * The attribute that stores the unique encryption key
+     *
+     * @var string
+     */
+    protected $encryptionKeyAttribute = 'encryption_key';
+
+    /**
      * The attributes that are protected
      *
      * @var array

@@ -19,18 +19,19 @@ trait ProtectedAttributes
      */
     protected $encrypter = null;
 
+    /**
+     * @return Encrypter
+     */
     public function getEncrypter()
     {
         if ($this->encrypter === null) {
 
-            if ($this->encryption_key === null) {
-                // Generate new key for new object
+            $key = $this->getAttribute($this->encryptionKeyAttribute);
+
+            // Generate a new key
+            if ($key === null) {
                 $key = random_bytes(32);
-                // Encrypt the key with the application key
-                $this->encryption_key = Crypt::encrypt($key);
-            } else {
-                // Decrypt the key of an existing row
-                $key = Crypt::decrypt($this->encryption_key);
+                $this->setAttribute($this->encryptionKeyAttribute, $key);
             }
 
             // Create new Encrypter object with key from this record
@@ -46,9 +47,15 @@ trait ProtectedAttributes
      * @param $value
      * @return mixed
      */
-    protected function encrypt($value)
+    protected function encrypt($key, $value)
     {
-        return $this->getEncrypter()->encrypt($value);
+        if ($this->isProtectedAttribute($key)) {
+            return $this->getEncrypter()->encrypt($value);
+        } elseif ($this->isEncryptionKeyAttribute($key)) {
+            return Crypt::encrypt($value);
+        } else {
+            return $value;
+        }
     }
 
     /**
@@ -57,9 +64,15 @@ trait ProtectedAttributes
      * @param $value
      * @return mixed
      */
-    protected function decrypt($value)
+    protected function decrypt($key, $value)
     {
-        return $this->getEncrypter()->decrypt($value);
+        if ($this->isProtectedAttribute($key)) {
+            return $this->getEncrypter()->decrypt($value);
+        } elseif ($this->isEncryptionKeyAttribute($key)) {
+            return Crypt::decrypt($value);
+        } else {
+            return $value;
+        }
     }
 
     /**
@@ -68,9 +81,20 @@ trait ProtectedAttributes
      * @param $key
      * @return bool
      */
-    protected function isProtected($key)
+    protected function isProtectedAttribute($key)
     {
         return is_array($this->protected) && in_array($key, $this->protected);
+    }
+
+    /**
+     * Whether this is the column that stores the encryption key
+     *
+     * @param $key
+     * @return bool
+     */
+    protected function isEncryptionKeyAttribute($key)
+    {
+        return $key === $this->encryptionKeyAttribute;
     }
 
     /**
@@ -82,9 +106,7 @@ trait ProtectedAttributes
      */
     public function setAttribute($key, $value)
     {
-        if ($this->isProtected($key)) {
-            $value = $this->encrypt($value);
-        }
+        $value = $this->encrypt($key, $value);
 
         return parent::setAttribute($key, $value);
     }
@@ -99,11 +121,7 @@ trait ProtectedAttributes
     {
         $value = parent::getAttributeFromArray($key);
 
-        if ($this->isProtected($key)) {
-            $value = $this->decrypt($value);
-        }
-
-        return $value;
+        return $this->decrypt($key, $value);
     }
 
     /**
@@ -116,10 +134,10 @@ trait ProtectedAttributes
         $attributes = parent::getArrayableAttributes();
 
         foreach ($attributes as $key => &$value) {
-            if ($this->isProtected($key)) {
-                $value = $this->decrypt($value);
-            }
+            $value = $this->decrypt($key, $value);
         }
+
+        unset($attributes[$this->encryptionKeyAttribute]);
 
         return $attributes;
     }
@@ -134,10 +152,10 @@ trait ProtectedAttributes
         $attributes = parent::getAttributes();
 
         foreach ($attributes as $key => &$value) {
-            if ($this->isProtected($key)) {
-                $value = $this->decrypt($value);
-            }
+            $value = $this->decrypt($key, $value);
         }
+
+        unset($attributes[$this->encryptionKeyAttribute]);
 
         return $attributes;
     }
