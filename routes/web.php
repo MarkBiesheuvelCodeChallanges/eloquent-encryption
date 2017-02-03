@@ -11,5 +11,37 @@
 |
 */
 
-$app->get('/', 'Controller@index');
-$app->get('/raw', 'Controller@raw');
+$app->get('', [
+    'as'   => 'default',
+    'uses' => 'Controller@index',
+]);
+
+$app->get('products', [
+    'as'   => 'products',
+    'uses' => 'ProductController@index',
+]);
+
+$app->post('products', [
+    'as'   => 'products.create',
+    'uses' => 'ProductController@create',
+]);
+
+$app->get('products/{id}', [
+    'as'   => 'products.read',
+    'uses' => 'ProductController@read',
+]);
+
+$app->put('products/{id}', [
+    'as'   => 'products.update',
+    'uses' => 'ProductController@update',
+]);
+
+$app->patch('products/{id}', [
+    'as'   => 'products.patch',
+    'uses' => 'ProductController@update',
+]);
+
+$app->delete('products/{id}', [
+    'as'   => 'products.delete',
+    'uses' => 'ProductController@delete',
+]);

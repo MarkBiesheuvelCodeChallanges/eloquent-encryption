@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Message extends Model
+class Product extends Model
 {
     use Concerns\ProtectedAttributes;
 
@@ -14,7 +14,8 @@ class Message extends Model
      * @var array
      */
     protected $protected = [
-        'to',
-        'content',
+        'title',
+        'description',
+        'price',
     ];
 }
