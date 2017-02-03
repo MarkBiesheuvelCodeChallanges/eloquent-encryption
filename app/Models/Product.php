@@ -18,4 +18,14 @@ class Product extends Model
         'description',
         'price',
     ];
+
+    /**
+     * The attributes that should be cast to native types.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'price' => 'float',
+    ];
+
 }
