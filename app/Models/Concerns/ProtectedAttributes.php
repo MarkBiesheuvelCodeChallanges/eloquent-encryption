@@ -3,6 +3,7 @@
 namespace App\Models\Concerns;
 
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Encryption\Encrypter;
 
 /**
  * Class ProtectedAttributes
@@ -14,6 +15,32 @@ use Illuminate\Support\Facades\Crypt;
 trait ProtectedAttributes
 {
     /**
+     * @var Encrypter
+     */
+    protected $encrypter = null;
+
+    public function getEncrypter()
+    {
+        if ($this->encrypter === null) {
+
+            if ($this->encryption_key === null) {
+                // Generate new key for new object
+                $key = random_bytes(32);
+                // Encrypt the key with the application key
+                $this->encryption_key = Crypt::encrypt($key);
+            } else {
+                // Decrypt the key of an existing row
+                $key = Crypt::decrypt($this->encryption_key);
+            }
+
+            // Create new Encrypter object with key from this record
+            $this->encrypter = new Encrypter($key, 'AES-256-CBC');
+        }
+
+        return $this->encrypter;
+    }
+
+    /**
      * Encrypt a value
      *
      * @param $value
@@ -21,7 +48,7 @@ trait ProtectedAttributes
      */
     protected function encrypt($value)
     {
-        return Crypt::encrypt($value);
+        return $this->getEncrypter()->encrypt($value);
     }
 
     /**
@@ -32,7 +59,7 @@ trait ProtectedAttributes
      */
     protected function decrypt($value)
     {
-        return Crypt::decrypt($value);
+        return $this->getEncrypter()->decrypt($value);
     }
 
     /**
